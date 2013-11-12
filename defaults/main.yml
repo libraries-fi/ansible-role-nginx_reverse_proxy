@@ -1,0 +1,4 @@
+---
+proxy_cache_valid_time: '1d'
+proxy_cache_inactive: '1d'
+nginx_port: 80

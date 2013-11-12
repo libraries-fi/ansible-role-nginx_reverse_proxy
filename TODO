@@ -1,0 +1,5 @@
+- asenna nginx-konffit jotka on kopsattu sellaisenaan kirjasampo.fistä
+- drupal-moduulien asennus jostain (purge, cache_expiration tjsp.)
+- mahdolliset rulet...
+- drupal-konffit settings.php:ssa
+- suurin osa näistä ei varmaan tuu suoraan nginxin konffausrooliin

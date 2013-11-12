@@ -1,0 +1,6 @@
+---
+allow_duplicates: yes
+dependencies:
+# TODO: can't easily use the group_by stuff here AFAIK so directly including squeeze...
+  - role: nginx/common
+  - role: nginx/distro/squeeze

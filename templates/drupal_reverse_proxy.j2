@@ -1,0 +1,47 @@
+server {
+    listen {{nginx_port}} default;
+
+#    access_log  /var/log/nginx/default.access.log;
+    root {{sites_dir}}/{{site_name}}/www;
+
+
+    location ~ .(gif|jpg|jpeg|png|js|css|ico)$ {
+        try_files $uri @proxy;
+    }
+
+
+location ~ /files/styles/ {
+ # expires 2h;
+ try_files $uri @proxy;
+ }
+
+{% if site_specific is defined %}
+{{site_specific}}
+{% endif %}
+
+    location @proxy {
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://www.{{site_name}}:{{apache_port}};
+    }
+
+
+    location / {
+   # queries (maybe), drupal cookies, or not GET methods, all require PHP processing.
+{% if disable_cache_if_query_params is defined %}
+    if ($query_string ~ ".+") {
+      return 405;
+    }{% endif %}
+    if ($http_cookie ~ "DRUPAL_UID" ) {
+      return 405;
+    }
+    if ($request_method !~ ^(GET|HEAD|PURGE)$ ) {
+      return 405;
+    }
+    error_page 405 = @proxy;
+
+    include proxy_cache_options;
+    
+    }
+
+}
