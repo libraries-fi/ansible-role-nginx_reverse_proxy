@@ -1,6 +1,7 @@
     proxy_ignore_headers Expires;
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_hide_header {{nginx_proxy_hide_header}};
     proxy_cache STATIC;
     proxy_cache_key "$scheme$host$request_uri";
     proxy_cache_valid  200 302 301 {{ proxy_cache_valid_time }};
@@ -10,4 +11,3 @@
     proxy_cache_purge PURGE from {{purge_from}};
     proxy_cache_bypass $no_cache;
     proxy_no_cache $no_cache;
-    proxy_pass http://{{apache_host}}:{{apache_port}};

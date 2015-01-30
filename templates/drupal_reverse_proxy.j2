@@ -1,9 +1,9 @@
 server {
-    listen {{nginx_port}} default;
+    listen {{nginx_port}};
 
 #    access_log  /var/log/nginx/default.access.log;
-    root {{sites_dir}}/{{site_name}}/www;
-
+    root {{sites_dir}}/{{ site_name ~ local_test_environment|default('') }}/www;
+    server_name {{ apache_host ~ local_test_environment|default('') }} {{ 'www.' ~ apache_host ~ local_test_environment|default('') }};
 
     location ~ .(gif|jpg|jpeg|png|js|css|ico)$ {
         try_files $uri @proxy;
@@ -22,7 +22,8 @@ location ~ /files/styles/ {
     location @proxy {
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_pass http://{{apache_host}}:{{apache_port}};
+        proxy_hide_header {{nginx_proxy_hide_header}};
+        proxy_pass http://{{ apache_host ~ local_test_environment|default('') }}:{{apache_port}};
     }
 
 
@@ -41,7 +42,7 @@ location ~ /files/styles/ {
     error_page 405 = @proxy;
 
     include proxy_cache_options;
-
+    proxy_pass http://{{apache_host  ~ local_test_environment|default('')}}:{{apache_port}};
     }
 
 }
