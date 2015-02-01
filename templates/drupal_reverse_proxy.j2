@@ -31,6 +31,7 @@ location ~ /files/styles/ {
 
 
     location / {
+{% if nginx_reverse_proxy_cache_exclude is defined %}
    # queries (maybe), drupal cookies, or not GET methods, all require PHP processing.
 {% if disable_cache_if_query_params is defined %}
     if ($query_string ~ ".+") {
@@ -43,7 +44,7 @@ location ~ /files/styles/ {
       return 405;
     }
     error_page 405 = @proxy;
-
+{% endif %}
     include proxy_cache_options;
     proxy_pass http://{{apache_host  ~ local_test_environment|default('')}}:{{apache_port}};
     }
