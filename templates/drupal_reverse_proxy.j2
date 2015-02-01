@@ -2,6 +2,8 @@ server {
     listen {{nginx_port}};
 
 #    access_log  /var/log/nginx/default.access.log;
+
+{% if nginx_reverse_proxy_root is defined %}
     root {{sites_dir}}/{{ site_name ~ local_test_environment|default('') }}/www;
     server_name {{ apache_host ~ local_test_environment|default('') }} {{ 'www.' ~ apache_host ~ local_test_environment|default('') }};
 
@@ -14,11 +16,12 @@ location ~ /files/styles/ {
  # expires 2h;
  try_files $uri @proxy;
  }
+{% endif %}
 
 {% if site_specific is defined %}
 {{site_specific}}
 {% endif %}
-
+# Everything that needs to pass without caching goes through this.
     location @proxy {
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

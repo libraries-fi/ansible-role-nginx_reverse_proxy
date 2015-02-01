@@ -3,3 +3,5 @@ proxy_cache_valid_time: '1d'
 nginx_port: 80
 purge_from: 127.0.0.1 {{ansible_default_ipv4.address}}
 nginx_proxy_hide_header: x-drupal-cache-tags
+nginx_reverse_proxy_cache_exclude: True
+nginx_proxy_root: True
