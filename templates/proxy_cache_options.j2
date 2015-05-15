@@ -1,7 +1,7 @@
     proxy_ignore_headers Expires;
-    proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_hide_header {{nginx_proxy_hide_header}};
+{% for proxy_cache_option in nginx_reverse_proxy_cache_options %}
+    {{ proxy_cache_option }}
+{% endfor %}
     proxy_cache STATIC;
     proxy_cache_key "$scheme$host$request_uri";
     proxy_cache_valid  200 302 301 {{ proxy_cache_valid_time }};

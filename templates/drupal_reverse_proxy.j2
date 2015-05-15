@@ -1,11 +1,16 @@
 server {
-    listen {{nginx_port}};
+    {% for definition in nginx_listen %}listen {{definition}};
+      {% endfor %}
 
-#    access_log  /var/log/nginx/default.access.log;
+{% if nginx_reverse_proxy_ssl == True %}
+    ssl    on;
+    ssl_certificate {{ ssl_certificate_certificate_dir }}/{{ ssl_certificate_chained }};
+    ssl_certificate_key {{ ssl_certificate_key_dir }}/{{ ssl_certificate_key }};
+{% endif %}
 
-{% if nginx_reverse_proxy_root is defined %}
-    root {{sites_dir}}/{{ site_name ~ local_test_environment|default('') }}/www;
-    server_name {{ apache_host ~ local_test_environment|default('') }} {{ 'www.' ~ apache_host ~ local_test_environment|default('') }};
+    server_name {{ nginx_reverse_proxy_site_name ~ local_test_environment|default('') }} {{ 'www.' ~ nginx_reverse_proxy_site_name ~ local_test_environment|default('') }};
+{% if nginx_reverse_proxy_root == True %}
+    root {{sites_dir}}/{{ nginx_reverse_proxy_site_name ~ local_test_environment|default('') }}/www;
 
     location ~ .(gif|jpg|jpeg|png|js|css|ico)$ {
         try_files $uri @proxy;
@@ -23,30 +28,22 @@ location ~ /files/styles/ {
 {% endif %}
 # Everything that needs to pass without caching goes through this.
     location @proxy {
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_hide_header {{nginx_proxy_hide_header}};
-        proxy_pass http://{{ apache_host ~ local_test_environment|default('') }}:{{apache_port}};
+{% for proxy_cache_option in nginx_reverse_proxy_cache_options %}
+        {{ proxy_cache_option }}
+{% endfor %}
+        proxy_pass http://{{ nginx_reverse_proxy_upstream_host ~ local_test_environment|default('') }}:{{nginx_reverse_proxy_upstream_port}};
     }
 
 
     location / {
-{% if nginx_reverse_proxy_cache_exclude is defined %}
-   # queries (maybe), drupal cookies, or not GET methods, all require PHP processing.
-{% if disable_cache_if_query_params is defined %}
-    if ($query_string ~ ".+") {
-      return 405;
-    }{% endif %}
-    if ($http_cookie ~ "DRUPAL_UID" ) {
-      return 405;
-    }
-    if ($request_method !~ ^(GET|HEAD|PURGE)$ ) {
+{% for condition in nginx_reverse_proxy_exclude_cache_conditions %}
+    if ( {{ condition }} ) {
       return 405;
     }
     error_page 405 = @proxy;
-{% endif %}
+{% endfor %}
     include proxy_cache_options;
-    proxy_pass http://{{apache_host  ~ local_test_environment|default('')}}:{{apache_port}};
+    proxy_pass http://{{nginx_reverse_proxy_upstream_host  ~ local_test_environment|default('')}}:{{nginx_reverse_proxy_upstream_port}};
     }
 
 }
