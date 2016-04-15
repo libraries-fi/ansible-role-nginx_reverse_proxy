@@ -31,24 +31,36 @@ location ~ /files/styles/ {
 {% if site_specific is defined %}
 {{site_specific}}
 {% endif %}
+{%
+if nginx_reverse_proxy_upstream_host != 'localhost' %}
+{% set nginx_reverse_proxy_upstream_host = nginx_reverse_proxy_upstream_host ~ local_test_environment|default('') %}
+{% endif %}
 # Everything that needs to pass without caching goes through this.
     location @proxy {
+       proxy_set_header Host {{ nginx_reverse_proxy_upstream_header_host }};
 {% for proxy_cache_option in nginx_reverse_proxy_cache_options %}
         {{ proxy_cache_option }}
 {% endfor %}
-        proxy_pass http://{{ nginx_reverse_proxy_upstream_host ~ local_test_environment|default('') }}:{{nginx_reverse_proxy_upstream_port}};
+        proxy_pass {{ nginx_reverse_proxy_pass }};
     }
 
-
-    location / {
+{% for nginx_reverse_proxy_location_expression in nginx_reverse_proxy_location_expressions %}
+    location {{ nginx_reverse_proxy_location_expression }} {
 {% for condition in nginx_reverse_proxy_exclude_cache_conditions %}
     if ( {{ condition }} ) {
       return 405;
     }
     error_page 405 = @proxy;
 {% endfor %}
-    include proxy_cache_options;
-    proxy_pass http://{{nginx_reverse_proxy_upstream_host  ~ local_test_environment|default('')}}:{{nginx_reverse_proxy_upstream_port}};
+    proxy_set_header Host {{ nginx_reverse_proxy_upstream_header_host }};
+    {% include 'proxy_cache_options.j2' %}
+    
+    proxy_pass {{ nginx_reverse_proxy_pass }};
     }
-
+{% endfor %}
+{% if nginx_reverse_proxy_deny_by_default %}
+    location / {
+    return 404;
+    }
+{% endif %}
 }

@@ -1,15 +1,11 @@
 ---
 
 - name: Install Drupal reverse proxy and static file server site config
-  template: src=drupal_reverse_proxy.j2 dest=/etc/nginx/sites-available/{{nginx_reverse_proxy_site_name}}-rproxy owner=root group=root mode=0644
-  notify: restart nginx
-
-- name: Install proxy_cache_options config
-  template: src=proxy_cache_options.j2 dest=/etc/nginx/proxy_cache_options owner=root group=root mode=0644
+  template: src=drupal_reverse_proxy.j2 dest=/etc/nginx/sites-available/{{ nginx_reverse_proxy_config_name }} owner=root group=root mode=0644
   notify: restart nginx
 
 - name: Enable Drupal reverse proxy and static file server
-  file: state=link src=/etc/nginx/sites-available/{{nginx_reverse_proxy_site_name}}-rproxy dest=/etc/nginx/sites-enabled/{{nginx_reverse_proxy_site_name}}-rproxy owner=root group=root
+  file: state=link src=/etc/nginx/sites-available/{{ nginx_reverse_proxy_config_name }} dest=/etc/nginx/sites-enabled/{{ nginx_reverse_proxy_config_name }} owner=root group=root
   notify: restart nginx
 
 - name: Create nginx cache dir
