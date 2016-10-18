@@ -41,6 +41,7 @@ if nginx_reverse_proxy_upstream_host != 'localhost' %}
 {% for proxy_cache_option in nginx_reverse_proxy_cache_options %}
         {{ proxy_cache_option }}
 {% endfor %}
+        proxy_cache off;
         proxy_pass {{ nginx_reverse_proxy_pass }};
     }
 
@@ -54,7 +55,7 @@ if nginx_reverse_proxy_upstream_host != 'localhost' %}
 {% endfor %}
     proxy_set_header Host {{ nginx_reverse_proxy_upstream_header_host }};
     {% include 'proxy_cache_options.j2' %}
-    
+
     proxy_pass {{ nginx_reverse_proxy_pass }};
     }
 {% endfor %}

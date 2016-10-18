@@ -14,6 +14,8 @@ nginx_reverse_proxy_cache_options:
   - proxy_cache_purge PURGE from {{purge_from}};
   - proxy_cache_bypass $no_cache;
   - proxy_no_cache $no_cache;
+  - proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+
 # queries (maybe), drupal cookies, or not GET methods, all require PHP processing.
 nginx_reverse_proxy_exclude_cache_conditions:
   - $http_cookie ~ "DRUPAL_UID"
@@ -28,4 +30,3 @@ nginx_reverse_proxy_pass: http://{{ nginx_reverse_proxy_upstream_host }}:{{ ngin
 nginx_reverse_proxy_location_expressions:
   - /
 nginx_reverse_proxy_deny_by_default: False
-
