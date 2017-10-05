@@ -15,7 +15,7 @@ server {
 {% endfor %}
 {% endif %}
 {% if nginx_reverse_proxy_root == True %}
-    root {{sites_dir}}/{{ nginx_reverse_proxy_site_name }}/www;
+    root {{ nginx_reverse_proxy_root }};
 
     location ~ .(gif|jpg|jpeg|png|js|css|ico)$ {
         try_files $uri @proxy;
