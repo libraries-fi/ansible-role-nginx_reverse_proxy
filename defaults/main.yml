@@ -30,4 +30,4 @@ nginx_reverse_proxy_pass: http://{{ nginx_reverse_proxy_upstream_host }}:{{ ngin
 nginx_reverse_proxy_location_expressions:
   - /
 nginx_reverse_proxy_deny_by_default: False
-nginx_reverse_proxy_root: "{{sites_dir}}/{{ nginx_reverse_proxy_site_name }}/www"
+nginx_reverse_proxy_root_path: "{{sites_dir}}/{{ nginx_reverse_proxy_site_name }}/www"
