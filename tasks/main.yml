@@ -1,5 +1,11 @@
 ---
 
+- name: Install Nginx Cache Purge module (Debian)
+  package:
+    name: libnginx-mod-http-cache-purge
+    state: present
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version >= 8
+
 - name: Install reverse proxy and static file server site config.
   template:
     src=nginx_reverse_proxy.j2
