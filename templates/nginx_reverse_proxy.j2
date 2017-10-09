@@ -53,6 +53,13 @@ if nginx_reverse_proxy_upstream_host != 'localhost' %}
     }
     error_page 405 = @proxy;
 {% endfor %}
+{% if nginx_reverse_proxy_cookies is defined %}
+{% for cookie in nginx_reverse_proxy_cookies %}
+   if ({{ cookie.condition }}) {
+      {{ cookie.setter }}
+   }
+{% endfor %}
+{% endif %}
     proxy_set_header Host {{ nginx_reverse_proxy_upstream_header_host }};
     {% include 'proxy_cache_options.j2' %}
 
