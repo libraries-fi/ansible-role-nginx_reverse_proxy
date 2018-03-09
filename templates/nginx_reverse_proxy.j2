@@ -3,7 +3,6 @@ server {
       {% endfor %}
 
 {% if nginx_reverse_proxy_ssl == True %}
-    ssl    on;
     ssl_certificate {{ ssl_certificate_certificate_dir }}/{{ ssl_certificate_chained }};
     ssl_certificate_key {{ ssl_certificate_key_dir }}/{{ ssl_certificate_key }};
 {% endif %}
