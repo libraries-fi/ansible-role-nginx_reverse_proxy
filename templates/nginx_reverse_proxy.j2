@@ -1,6 +1,6 @@
 server {
     {% for definition in nginx_listen %}listen {{definition}};
-      {% endfor %}
+    {% endfor %}
 
 {% if nginx_reverse_proxy_ssl == True %}
     ssl_certificate {{ ssl_certificate_certificate_dir }}/{{ ssl_certificate_chained }};
