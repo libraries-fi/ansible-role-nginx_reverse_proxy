@@ -7,10 +7,10 @@ server {
     ssl_certificate_key {{ ssl_certificate_key_dir }}/{{ ssl_certificate_key }};
 {% endif %}
 
-    server_name {{ nginx_reverse_proxy_site_name ~ local_test_environment|default('') }} {{ 'www.' ~ nginx_reverse_proxy_site_name ~ local_test_environment|default('') }};
+    server_name {{ nginx_reverse_proxy_server_name }}{% if nginx_reverse_proxy_www_name %} {{ 'www.' ~ nginx_reverse_proxy_server_name }}{% endif %};
 {% if nginx_reverse_proxy_alternate_site_names is defined %}
 {% for name in nginx_reverse_proxy_alternate_site_names %}
-    server_name {{ name ~ local_test_environment|default('') }} {{ 'www.' ~ name ~ local_test_environment|default('') }};
+    server_name {{ name ~ local_test_environment|default('') }}{% if nginx_reverse_proxy_www_name %} {{ 'www.' ~ name ~ local_test_environment|default('') }}{% endif %};
 {% endfor %}
 {% endif %}
 {% if nginx_reverse_proxy_root == True %}
