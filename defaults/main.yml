@@ -24,12 +24,7 @@ nginx_reverse_proxy_exclude_cache_conditions:
 
 nginx_reverse_proxy_upstream_host: localhost
 nginx_reverse_proxy_upstream_port: 8080
-nginx_reverse_proxy_upstream_header_host: "{{ nginx_reverse_proxy_site_name }}"
-nginx_reverse_proxy_config_name: "{{nginx_reverse_proxy_site_name}}-rproxy"
-nginx_reverse_proxy_server_name: "{{ nginx_reverse_proxy_site_name ~ local_test_environment|default('') }}"
 nginx_reverse_proxy_www_name: yes
-nginx_reverse_proxy_pass: http://{{ nginx_reverse_proxy_upstream_host }}:{{ nginx_reverse_proxy_upstream_port }}
 nginx_reverse_proxy_location_expressions:
   - /
 nginx_reverse_proxy_deny_by_default: False
-nginx_reverse_proxy_root_path: "{{sites_dir}}/{{ nginx_reverse_proxy_site_name }}/www"

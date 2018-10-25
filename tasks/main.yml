@@ -1,5 +1,35 @@
 ---
 
+- name: Set nginx_reverse_proxy_upstream_header_host default value.
+  set_fact:
+    nginx_reverse_proxy_upstream_header_host: "{{ nginx_reverse_proxy_site_name }}"
+  when:
+    nginx_reverse_proxy_upstream_header_host is undefined
+
+- name: Set nginx_reverse_proxy_config_name default value.
+  set_fact:
+    nginx_reverse_proxy_config_name: "{{nginx_reverse_proxy_site_name}}-rproxy"
+  when:
+    nginx_reverse_proxy_config_name is undefined
+
+- name: Set nginx_reverse_proxy_server_name default value.
+  set_fact:
+    nginx_reverse_proxy_server_name: "{{ nginx_reverse_proxy_site_name ~ local_test_environment|default('') }}"
+  when:
+    nginx_reverse_proxy_server_name is undefined
+
+- name: Set nginx_reverse_proxy_pass default value.
+  set_fact:
+    nginx_reverse_proxy_pass: http://{{ nginx_reverse_proxy_upstream_host }}:{{ nginx_reverse_proxy_upstream_port }}
+  when:
+    nginx_reverse_proxy_pass is undefined
+
+- name: Set nginx_reverse_proxy_root_path default value.
+  set_fact:
+    nginx_reverse_proxy_root_path: "{{sites_dir}}/{{ nginx_reverse_proxy_site_name }}/www"
+  when:
+    nginx_reverse_proxy_root_path is undefined
+
 - name: Install Nginx Cache Purge module (Debian)
   package:
     name: libnginx-mod-http-cache-purge
