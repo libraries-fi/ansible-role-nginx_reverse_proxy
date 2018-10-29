@@ -7,14 +7,14 @@ server {
     ssl_certificate_key {{ ssl_certificate_key_dir }}/{{ ssl_certificate_key }};
 {% endif %}
 
-    server_name {{ nginx_reverse_proxy_server_name }}{% if nginx_reverse_proxy_www_name %} {{ 'www.' ~ nginx_reverse_proxy_server_name }}{% endif %};
+    server_name {{ __nginx_reverse_proxy_server_name }}{% if nginx_reverse_proxy_www_name %} {{ 'www.' ~ __nginx_reverse_proxy_server_name }}{% endif %};
 {% if nginx_reverse_proxy_alternate_site_names is defined %}
 {% for name in nginx_reverse_proxy_alternate_site_names %}
     server_name {{ name ~ local_test_environment|default('') }}{% if nginx_reverse_proxy_www_name %} {{ 'www.' ~ name ~ local_test_environment|default('') }}{% endif %};
 {% endfor %}
 {% endif %}
 {% if nginx_reverse_proxy_root == True %}
-    root {{ nginx_reverse_proxy_root_path }};
+    root {{ __nginx_reverse_proxy_root_path }};
 
     location ~ .(gif|jpg|jpeg|png|js|css|ico)$ {
         try_files $uri @proxy;
@@ -36,12 +36,12 @@ if nginx_reverse_proxy_upstream_host != 'localhost' %}
 {% endif %}
 # Everything that needs to pass without caching goes through this.
     location @proxy {
-       proxy_set_header Host {{ nginx_reverse_proxy_upstream_header_host }};
+       proxy_set_header Host {{ __nginx_reverse_proxy_upstream_header_host }};
 {% for proxy_cache_option in nginx_reverse_proxy_cache_options %}
         {{ proxy_cache_option }}
 {% endfor %}
         proxy_cache off;
-        proxy_pass {{ nginx_reverse_proxy_pass }};
+        proxy_pass {{ __nginx_reverse_proxy_pass }};
     }
 
 {% for nginx_reverse_proxy_location_expression in nginx_reverse_proxy_location_expressions %}
@@ -59,10 +59,10 @@ if nginx_reverse_proxy_upstream_host != 'localhost' %}
    }
 {% endfor %}
 {% endif %}
-    proxy_set_header Host {{ nginx_reverse_proxy_upstream_header_host }};
+    proxy_set_header Host {{ __nginx_reverse_proxy_upstream_header_host }};
     {% include 'proxy_cache_options.j2' %}
 
-    proxy_pass {{ nginx_reverse_proxy_pass }};
+    proxy_pass {{ __nginx_reverse_proxy_pass }};
     }
 {% endfor %}
 {% if nginx_reverse_proxy_deny_by_default %}

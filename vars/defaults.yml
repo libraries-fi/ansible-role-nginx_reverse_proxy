@@ -1,0 +1,20 @@
+---
+
+# These vars are included *after* role parameters so that they can use them for templating.
+# That is why they cannot be in defaults/main.yml.
+# Variables are prefixed with __ to work around 'recursive loop detected in template string' error in Ansible.
+
+__nginx_reverse_proxy_upstream_header_host_default: "{{ nginx_reverse_proxy_site_name }}"
+__nginx_reverse_proxy_upstream_header_host: "{{ nginx_reverse_proxy_upstream_header_host | default(__nginx_reverse_proxy_upstream_header_host_default) }}"
+
+__nginx_reverse_proxy_config_name_default: "{{nginx_reverse_proxy_site_name}}-rproxy"
+__nginx_reverse_proxy_config_name: "{{ nginx_reverse_proxy_config_name | default(__nginx_reverse_proxy_config_name_default) }}"
+
+__nginx_reverse_proxy_server_name_default: "{{ nginx_reverse_proxy_site_name ~ local_test_environment | default('') }}"
+__nginx_reverse_proxy_server_name: "{{ nginx_reverse_proxy_server_name | default(__nginx_reverse_proxy_server_name_default) }}"
+
+__nginx_reverse_proxy_pass_default: http://{{ nginx_reverse_proxy_upstream_host }}:{{ nginx_reverse_proxy_upstream_port }}
+__nginx_reverse_proxy_pass: "{{ nginx_reverse_proxy_pass | default(__nginx_reverse_proxy_pass_default) }}"
+
+__nginx_reverse_proxy_root_path_default: "{{sites_dir}}/{{ nginx_reverse_proxy_site_name }}/www"
+__nginx_reverse_proxy_root_path: "{{ nginx_reverse_proxy_root_path | default(__nginx_reverse_proxy_root_path_default) }}"

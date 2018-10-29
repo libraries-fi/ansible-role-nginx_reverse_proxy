@@ -1,34 +1,7 @@
 ---
 
-- name: Set nginx_reverse_proxy_upstream_header_host default value.
-  set_fact:
-    nginx_reverse_proxy_upstream_header_host: "{{ nginx_reverse_proxy_site_name }}"
-  when:
-    nginx_reverse_proxy_upstream_header_host is undefined
-
-- name: Set nginx_reverse_proxy_config_name default value.
-  set_fact:
-    nginx_reverse_proxy_config_name: "{{nginx_reverse_proxy_site_name}}-rproxy"
-  when:
-    nginx_reverse_proxy_config_name is undefined
-
-- name: Set nginx_reverse_proxy_server_name default value.
-  set_fact:
-    nginx_reverse_proxy_server_name: "{{ nginx_reverse_proxy_site_name ~ local_test_environment|default('') }}"
-  when:
-    nginx_reverse_proxy_server_name is undefined
-
-- name: Set nginx_reverse_proxy_pass default value.
-  set_fact:
-    nginx_reverse_proxy_pass: http://{{ nginx_reverse_proxy_upstream_host }}:{{ nginx_reverse_proxy_upstream_port }}
-  when:
-    nginx_reverse_proxy_pass is undefined
-
-- name: Set nginx_reverse_proxy_root_path default value.
-  set_fact:
-    nginx_reverse_proxy_root_path: "{{sites_dir}}/{{ nginx_reverse_proxy_site_name }}/www"
-  when:
-    nginx_reverse_proxy_root_path is undefined
+- name: Include default variables
+  include_vars: defaults.yml
 
 - name: Install Nginx Cache Purge module (Debian)
   package:
@@ -38,34 +11,45 @@
 
 - name: Install reverse proxy and static file server site config.
   template:
-    src=nginx_reverse_proxy.j2
-    dest=/etc/nginx/sites-available/{{ nginx_reverse_proxy_config_name }}
-    owner=root
-    group=root
-    mode=0644
+    src: nginx_reverse_proxy.j2
+    dest: "/etc/nginx/sites-available/{{ __nginx_reverse_proxy_config_name }}"
+    owner: root
+    group: root
+    mode: 0644
   notify: restart nginx
 
 - name: Create nginx config fragment dir.
   file:
-    state=directory
-    path=/etc/nginx/conf.d
-    owner=root group=root
-    mode=0775
+    state: directory
+    path: /etc/nginx/conf.d
+    owner: root
+    group: root
+    mode: 0775
   notify: restart nginx
 
 - name: Install proxy_cache default configuration.
   template:
-    src=proxy_cache_options.j2
-    dest=/etc/nginx/conf.d/100_proxy_cache_options.conf
-    owner=root
-    group=root
-    mode=0644
+    src: proxy_cache_options.j2
+    dest: /etc/nginx/conf.d/100_proxy_cache_options.conf
+    owner: root
+    group: root
+    mode: 0644
   notify: restart nginx
 
 - name: Enable Drupal reverse proxy and static file server
-  file: state=link src=/etc/nginx/sites-available/{{ nginx_reverse_proxy_config_name }} dest=/etc/nginx/sites-enabled/{{ nginx_reverse_proxy_config_name }} owner=root group=root
+  file:
+    state: link
+    src: "/etc/nginx/sites-available/{{ __nginx_reverse_proxy_config_name }}"
+    dest: "/etc/nginx/sites-enabled/{{ __nginx_reverse_proxy_config_name }}"
+    owner: root
+    group: root
   notify: restart nginx
 
 - name: Create nginx cache dir
-  file: state=directory path=/var/spool/nginx/cache owner=www-data group=root mode=775
+  file:
+    state: directory
+    path: /var/spool/nginx/cache
+    owner: www-data
+    group: root
+    mode: 775
   notify: restart nginx
