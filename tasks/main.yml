@@ -48,5 +48,5 @@
     path: /var/spool/nginx/cache
     owner: www-data
     group: root
-    mode: 775
+    mode: 0775
   notify: restart nginx
