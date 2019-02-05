@@ -3,8 +3,7 @@ server {
     {% endfor %}
 
 {% if nginx_reverse_proxy_ssl == True %}
-    ssl_certificate {{ ssl_certificate_certificate_dir }}/{{ ssl_certificate_chained }};
-    ssl_certificate_key {{ ssl_certificate_key_dir }}/{{ ssl_certificate_key }};
+    {% include 'kifi_ansible_roles/ajsalminen.nginx_common/templates/ssl.j2' %}
 {% endif %}
 
     server_name {{ nginx_reverse_proxy_server_name }}{% if nginx_reverse_proxy_www_name %} {{ 'www.' ~ nginx_reverse_proxy_server_name }}{% endif %};
