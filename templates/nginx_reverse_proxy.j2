@@ -1,17 +1,26 @@
+# {{ ansible_managed }}
+{# Add local_test_enviroment top level domain to domain string in local testing. #}
+{% macro add_local(domain) -%}
+    {{domain}}{{local_test_environment|default('')}}
+{%- endmacro %}
+
 server {
-    {% for definition in nginx_listen %}listen {{definition}};
-    {% endfor %}
+{% for definition in nginx_listen %}
+    listen {{definition}};
+{% endfor %}
 
 {% if nginx_reverse_proxy_ssl == True %}
     {% include 'kifi_ansible_roles/ajsalminen.nginx_common/templates/ssl.j2' %}
 {% endif %}
 
-    server_name {{ nginx_reverse_proxy_server_name }}{% if nginx_reverse_proxy_www_name %} {{ 'www.' ~ nginx_reverse_proxy_server_name }}{% endif %};
+    server_name {{ add_local(nginx_reverse_proxy_server_name) }}{% if nginx_reverse_proxy_www_name %} {{ add_local('www.' ~ nginx_reverse_proxy_server_name) }}{% endif %};
+
 {% if nginx_reverse_proxy_alternate_site_names is defined %}
 {% for name in nginx_reverse_proxy_alternate_site_names %}
-    server_name {{ name ~ local_test_environment|default('') }}{% if nginx_reverse_proxy_www_name %} {{ 'www.' ~ name ~ local_test_environment|default('') }}{% endif %};
+    server_name {{ add_local(name) }}{% if nginx_reverse_proxy_www_name %} {{ add_local('www.' ~ name) }}{% endif %};
 {% endfor %}
 {% endif %}
+
 {% if nginx_reverse_proxy_root == True %}
     root {{ nginx_reverse_proxy_root_path }};
 
@@ -19,20 +28,20 @@ server {
         try_files $uri @proxy;
     }
 
-
-location ~ /files/styles/ {
- # expires 2h;
- try_files $uri @proxy;
- }
+    location ~ /files/styles/ {
+        # expires 2h;
+        try_files $uri @proxy;
+    }
 {% endif %}
 
 {% if site_specific is defined %}
 {{site_specific}}
 {% endif %}
-{%
-if nginx_reverse_proxy_upstream_host != 'localhost' %}
-{% set nginx_reverse_proxy_upstream_host = nginx_reverse_proxy_upstream_host ~ local_test_environment|default('') %}
+
+{% if nginx_reverse_proxy_upstream_host != 'localhost' %}
+{% set nginx_reverse_proxy_upstream_host = add_local(nginx_reverse_proxy_upstream_host) %}
 {% endif %}
+
 # Everything that needs to pass without caching goes through this.
     location @proxy {
        proxy_set_header Host {{ nginx_reverse_proxy_upstream_header_host }};
