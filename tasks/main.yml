@@ -40,6 +40,7 @@
     dest: "/etc/nginx/sites-enabled/{{ nginx_reverse_proxy_config_name }}"
     owner: root
     group: root
+    force: yes
   notify: restart nginx
 
 - name: Create nginx cache dir
