@@ -44,12 +44,20 @@ server {
 
 # Everything that needs to pass without caching goes through this.
     location @proxy {
+{% if nginx_reverse_proxy_auth_request is defined %}
+        auth_request {{ nginx_reverse_proxy_auth_request }};
+        auth_request_set $cookie $upstream_http_set_cookie;
+        add_header Set-Cookie $cookie;
+{% endif %}
        proxy_set_header Host {{ nginx_reverse_proxy_upstream_header_host }};
 {% for proxy_cache_option in nginx_reverse_proxy_cache_options %}
         {{ proxy_cache_option }}
 {% endfor %}
         proxy_cache off;
         proxy_pass {{ nginx_reverse_proxy_pass }};
+{% if nginx_reverse_proxy_auth_request is defined %}
+        error_page 401 = @error401;
+{% endif -%}
     }
 
 {% for nginx_reverse_proxy_location_expression in nginx_reverse_proxy_location_expressions %}
@@ -60,6 +68,9 @@ server {
     }
     error_page 405 = @proxy;
 {% endfor %}
+{% if nginx_reverse_proxy_auth_request is defined %}
+error_page 401 = @error401;
+{% endif %}
 {% if nginx_reverse_proxy_cookies is defined %}
 {% for cookie in nginx_reverse_proxy_cookies %}
    if ({{ cookie.condition }}) {
@@ -67,12 +78,23 @@ server {
    }
 {% endfor %}
 {% endif %}
+{% if nginx_reverse_proxy_auth_request is defined %}
+  auth_request {{ nginx_reverse_proxy_auth_request }};
+  auth_request_set $cookie $upstream_http_set_cookie;
+  add_header Set-Cookie $cookie;
+{% endif %}
     proxy_set_header Host {{ nginx_reverse_proxy_upstream_header_host }};
     {% include 'proxy_cache_options.j2' %}
 
     proxy_pass {{ nginx_reverse_proxy_pass }};
     }
 {% endfor %}
+{% if nginx_reverse_proxy_auth_request is defined %}
+location @error401 {
+    # Redirection to sso-auth login
+    return 302 https://login.{{ add_local(nginx_reverse_proxy_server_name) }}/login?go=$scheme://$http_host$request_uri;
+}
+{% endif %}
 {% if nginx_reverse_proxy_deny_by_default %}
     location / {
     return 404;

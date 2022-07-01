@@ -1,0 +1,30 @@
+
+# If the user is lead to /logout redirect them to the logout endpoint
+# of ngninx-sso which then will redirect the user to / on the current host
+location /logout {
+	#" Another server{} directive also proxying to http://127.0.0.1:8082
+	# return 302 https://login.luzifer.io/logout?go=$scheme://$http_host/;
+  return 302 https://login.{{ add_local(nginx_reverse_proxy_server_name) }}/logout?go=$scheme://$http_host/;
+}
+
+location {{ nginx_reverse_proxy_auth_request }} {
+  internal;
+# Access /auth endpoint to query login state
+#  proxy_pass http://127.0.0.1:8082/auth/;
+  proxy_pass {{ nginx_sso_auth_endpoint }};
+  proxy_pass_request_body off;
+	proxy_set_header Content-Length "";
+  # Set custom information for ACL matching: Each one is available as
+  # a field for matching: X-Host = x-host, ...
+  proxy_set_header X-Origin-URI $request_uri;
+  proxy_set_header X-Host $http_host;
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+# Define where to send the user to login and specify how to get back
+location @error401 {
+	# Another server{} directive also proxying to http://127.0.0.1:8082
+	return 302 https://login.{{ add_local(nginx_reverse_proxy_server_name) }}/login?go=$scheme://$http_host$request_uri;
+}
