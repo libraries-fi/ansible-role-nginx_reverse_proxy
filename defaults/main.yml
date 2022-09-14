@@ -33,3 +33,8 @@ nginx_reverse_proxy_location_expressions:
   - /
 nginx_reverse_proxy_deny_by_default: False
 nginx_reverse_proxy_root_path: "{{sites_dir}}/{{ nginx_reverse_proxy_site_name }}/www"
+
+# Nginx default Content-Security-Policy header definition
+nginx_reverse_proxy_consent_csp: None
+# Cookie name to check for toggling off consent CSP
+nginx_reverse_proxy_consent_cookie: $cookie_kifi_consent_marketing
