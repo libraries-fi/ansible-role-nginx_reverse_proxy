@@ -1,0 +1,5 @@
+{% if nginx_reverse_proxy_consent_csp is defined and nginx_reverse_proxy_consent_csp != "None" %}
+        if ({{ nginx_reverse_proxy_consent_cookie }} != "1") {
+          add_header Content-Security-Policy "{{ nginx_reverse_proxy_consent_csp }}";
+        }
+{% endif %}

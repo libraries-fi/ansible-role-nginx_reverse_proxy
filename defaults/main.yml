@@ -33,3 +33,12 @@ nginx_reverse_proxy_location_expressions:
   - /
 nginx_reverse_proxy_deny_by_default: False
 nginx_reverse_proxy_root_path: "{{sites_dir}}/{{ nginx_reverse_proxy_site_name }}/www"
+
+# Content-Security-Policy header definition that blocks content
+# before user consents to a cookie policy.
+nginx_reverse_proxy_consent_csp: None
+# An example policy for kirjastot.fi site:
+# nginx_reverse_proxy_consent_csp: "script-src 'unsafe-inline' 'self' *.cookiehub.net cookiehub.net cookiehub.com *.cookiehub.com gfx.kirjastot.fi; frame-src 'self' gfx.kirjastot.fi;"
+
+# Name of the cookie to check to see if user has given consent
+nginx_reverse_proxy_consent_cookie: $cookie_kifi_consent_marketing

@@ -45,6 +45,7 @@ server {
 # Everything that needs to pass without caching goes through this.
     location @proxy {
        proxy_set_header Host {{ nginx_reverse_proxy_upstream_header_host }};
+{% include 'nginx_csp.j2' %}
 {% for proxy_cache_option in nginx_reverse_proxy_cache_options %}
         {{ proxy_cache_option }}
 {% endfor %}
@@ -68,6 +69,7 @@ server {
 {% endfor %}
 {% endif %}
     proxy_set_header Host {{ nginx_reverse_proxy_upstream_header_host }};
+{% include 'nginx_csp.j2' %}
     {% include 'proxy_cache_options.j2' %}
 
     proxy_pass {{ nginx_reverse_proxy_pass }};
