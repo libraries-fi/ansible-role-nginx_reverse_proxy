@@ -1,10 +1,10 @@
 {# Add content security policies. The policies need to be defined in their respective variables:
-   nginx_reverse_proxy_marketing_csp and nginx_reverse_proxy_default_csp
+   nginx_reverse_proxy_marketing_csp and nginx_reverse_proxy_consent_csp
    These should be set in a place such as 'group_vars' or similar. 
 #}
-{% if nginx_reverse_proxy_default_csp is defined and nginx_reverse_proxy_default_csp != "None" %}
+{% if nginx_reverse_proxy_consent_csp is defined and nginx_reverse_proxy_consent_csp != "None" %}
         if ({{ nginx_reverse_proxy_consent_cookie }} != "1") {
-          add_header Content-Security-Policy "{{ nginx_reverse_proxy_default_csp }}";
+          add_header Content-Security-Policy "{{ nginx_reverse_proxy_consent_csp }}";
         }
 {% endif %}
 {% if nginx_reverse_proxy_marketing_csp is defined and nginx_reverse_proxy_marketing_csp != "None" %}
